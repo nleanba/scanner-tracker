@@ -175,3 +175,13 @@ deleteButton.addEventListener('click', deleteAll)
 document.addEventListener('input', recalulate)
 setInterval(recalulate, 10000)
 recalulate()
+
+if (navigator?.storage?.persist) {
+  navigator.storage.persist().then(b => {
+    if (!b) {
+      alert('Achtung: Möglicherweise werden die Daten nicht dauerhaft gespeichert.')
+    }
+  })
+} else {
+  alert('Achtung: Möglicherweise werden die Daten nicht dauerhaft gespeichert.')
+}
