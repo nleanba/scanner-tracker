@@ -17,6 +17,8 @@ const M = {
   stop: []
 }
 
+const CSV = []
+
 const getDateStamp = () => {
   const date = new Date()
   return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`
@@ -40,24 +42,22 @@ const getDuration = () => {
   while (M.start.length > stop.length) {
     stop.push(new Date())
   }
-  M.start.forEach((d, i) => duration += (stop[i].getTime() - d.getTime()) / 60
-  
-  000)
-  return `${Math.floor(duration / 60).toString().padStart(2, '0')}:${Math.floor(duration % 60).toString().padStart(2, '0')}`
+  M.start.forEach((d, i) => duration += (stop[i].getTime() - d.getTime()) / 60000)
+  return `${Math.floor(duration / 60).toString().padStart(2, '0')}:${Math.ceil(duration % 60).toString().padStart(2, '0')}`
 }
 
 const recalulate = () => {
   console.log('RC', getTimeStamp(new Date()))
   fromList.innerText = M.start.map(getTimeStamp).join('\n') || '--:--'
   arrowsList.innerText = '→\n'.repeat(M.start.length || 1)
-  toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.start.length > M.stop.length ? '--:--' : '')
+  toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.start.length > M.stop.length ? '\n--:--' : '')
   const result = {
     datum: getDateStamp(),
     id: idField.value || '',
     typ: typFields.find(r => r.checked)?.value || '',
-    tas: tasField.value || '',
-    höhe: höheField.value || '',
-    seiten: seitenField.value || '',
+    tas: +tasField.value || '',
+    höhe: +höheField.value || '',
+    seiten: +seitenField.value || '',
     time: getDuration(),
     kw: getWeekNumber(),
   }
@@ -89,7 +89,7 @@ const recalulate = () => {
     stopButton.setAttribute('disabled', 'disabled')
   }
 
-  const csv = Object.values(result).join(';')
+  const csv = Object.values(result).join(';') + ';'
   resultList.innerText = Object.entries(result).map(([a, b]) => `${a.padEnd(6)}: ${b}`).join('\n')
   return csv
 }
@@ -117,19 +117,25 @@ function pause () {
 }
 
 function stop () {
-  // TODO: only if end time missing
-  M.stop.push(new Date())
-  console.log(recalulate())
+  if (M.start.length < M.stop.length) M.stop.push(new Date())
 
-  // TODO: Save stuff
+  CSV.push(recalulate())
+  localStorage.setItem('scanner_tracker', CSV.join('\n'));
+  console.log(localStorage.getItem('scanner_tracker'))
+
+  M.start = []
+  M.stop = []
+  idField.value = ''
+  tasField.value = ''
+  höheField.value = ''
+  seitenField.value = ''
+  recalulate()
 
   startButton.removeAttribute('disabled')
   pauseButton.setAttribute('disabled', 'disabled')
-  stopButton.setAttribute('disabled', 'disabled')
 
   startButton.addEventListener('click', start)
   pauseButton.removeEventListener('click', pause)
-  stopButton.removeEventListener('click', stop)
 }
 
 startButton.addEventListener('click', start)
