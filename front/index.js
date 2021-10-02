@@ -8,6 +8,7 @@ const startButton = document.getElementById('start')
 const pauseButton = document.getElementById('pause')
 const stopButton = document.getElementById('stop')
 const downloadButton = document.getElementById('download')
+const deleteButton = document.getElementById('delete')
 
 const fromList = document.getElementById('from')
 const arrowsList = document.getElementById('arrows')
@@ -53,7 +54,7 @@ const recalulate = () => {
   console.log('RC', getTimeStamp(new Date()))
   fromList.innerText = M.start.map(getTimeStamp).join('\n') || '--:--'
   arrowsList.innerText = '→\n'.repeat(M.start.length || 1)
-  toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.start.length > M.stop.length ? '\n--:--' : '')
+  toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.stop.length ? '\n' : '') + (M.start.length > M.stop.length || !M.start.length ? '--:--' : '')
   const result = {
     datum: getDateStamp(),
     id: idField.value || '',
@@ -102,8 +103,8 @@ function start () {
   M.start.push(new Date())
   recalulate()
 
-  startButton.setAttribute('disabled', 'disabled')
-  pauseButton.removeAttribute('disabled')
+  startButton.hidden = true
+  pauseButton.hidden = false
 
   startButton.removeEventListener('click', start)
   pauseButton.addEventListener('click', pause)
@@ -113,8 +114,8 @@ function pause () {
   M.stop.push(new Date())
   recalulate()
 
-  startButton.removeAttribute('disabled')
-  pauseButton.setAttribute('disabled', 'disabled')
+  startButton.hidden = false
+  pauseButton.hidden = true
 
   startButton.addEventListener('click', start)
   pauseButton.removeEventListener('click', pause)
@@ -135,12 +136,21 @@ function stop () {
   seitenField.value = ''
   recalulate()
 
-  startButton.removeAttribute('disabled')
-  pauseButton.setAttribute('disabled', 'disabled')
+  startButton.hidden = false
+  pauseButton.hidden = true
 
   startButton.addEventListener('click', start)
   pauseButton.removeEventListener('click', pause)
   downloadButton.addEventListener('click', download)
+}
+
+function deleteAll () {
+  if (confirm('delete entries?')) {
+    localStorage.removeItem('scanner_tracker')
+    downloadButton.removeEventListener('click', download)
+    downloadButton.setAttribute('disabled', 'disabled')
+  }
+  recalulate()
 }
 
 function download () {
@@ -152,12 +162,7 @@ function download () {
   link.download = date + '.csv';
   link.href = `data:text/csv,${encodeURIComponent(csv)}`;
   link.click();
-  if (confirm('delete entries?')) {
-    localStorage.removeItem('scanner_tracker')
-    downloadButton.removeEventListener('click', download)
-    downloadButton.setAttribute('disabled', 'disabled')
-  }
-  recalulate()
+  deleteAll()
 }
 
 if (localStorage.getItem('scanner_tracker')) {
@@ -166,6 +171,7 @@ if (localStorage.getItem('scanner_tracker')) {
 }
 
 startButton.addEventListener('click', start)
-document.addEventListener('change', recalulate)
+deleteButton.addEventListener('click', deleteAll)
+document.addEventListener('input', recalulate)
 setInterval(recalulate, 10000)
 recalulate()

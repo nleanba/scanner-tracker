@@ -54,7 +54,7 @@
     }
 
     main>* {
-      width: 338px;
+      width: 337px;
     }
 
     footer {
@@ -142,6 +142,11 @@
       display: block;
     }
 
+    footer svg {
+      width: 36px;
+      height: 36px;
+    }
+
     .group * {
       display: block;
     }
@@ -168,6 +173,10 @@
     label:focus-within,
     button:focus {
       background: var(--bright);
+    }
+
+    *[hidden] {
+      display: none !important;
     }
   </style>
 
@@ -260,11 +269,10 @@
       <div class="group">
         <button id="start">
           <svg viewBox="0 0 24 24">
-            <path fill="currentColor"
-              d="M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+            <path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
           </svg>
         </button>
-        <button id="pause" disabled>
+        <button id="pause" hidden>
           <svg viewBox="0 0 24 24">
             <path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
           </svg>
@@ -281,11 +289,11 @@
             <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
           </svg>
         </button>
-        <!--<button id="delete">
+        <button id="delete">
           <svg viewBox="0 0 24 24">
             <path fill="currentColor" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" />
         </svg>
-        </button>-->
+        </button>
       </div>
     </div>
     <div class="row">
