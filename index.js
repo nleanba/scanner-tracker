@@ -51,7 +51,6 @@ const getDuration = () => {
 }
 
 const recalulate = () => {
-  console.log('RC', getTimeStamp(new Date()))
   fromList.innerText = M.start.map(getTimeStamp).join('\n') || '--:--'
   arrowsList.innerText = '→\n'.repeat(M.start.length || 1)
   toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.stop.length ? '\n' : '') + (M.start.length > M.stop.length || !M.start.length ? '--:--' : '')
@@ -95,7 +94,7 @@ const recalulate = () => {
 
   const csv = Object.values(result).join(';') + ';'
   resultList.innerText = localStorage.getItem('scanner_tracker')
-  currentList.innerText = Object.entries(result).map(([a, b]) => `${a.padEnd(5)}: ${b}`).filter(v => v.match(/datum|typ|time/)).join('\n')
+  currentList.innerHTML = `${result.typ || '<i>kein typ ausgewählt</i>'}\nDauer: ${result.time}\nDatum: ${result.datum} (KW ${result.kw})\n`
   return csv
 }
 
@@ -126,7 +125,6 @@ function stop () {
 
   CSV.push(recalulate())
   localStorage.setItem('scanner_tracker', CSV.join('\n'));
-  console.log(localStorage.getItem('scanner_tracker'))
 
   M.start = []
   M.stop = []
@@ -138,17 +136,24 @@ function stop () {
 
   startButton.hidden = false
   pauseButton.hidden = true
+  downloadButton.removeAttribute('disabled')
+  deleteButton.removeAttribute('disabled')
 
   startButton.addEventListener('click', start)
   pauseButton.removeEventListener('click', pause)
   downloadButton.addEventListener('click', download)
+  deleteButton.addEventListener('click', deleteAll)
 }
 
 function deleteAll () {
   if (confirm('delete entries?')) {
     localStorage.removeItem('scanner_tracker')
-    downloadButton.removeEventListener('click', download)
+
     downloadButton.setAttribute('disabled', 'disabled')
+    deleteButton.setAttribute('disabled', 'disabled')
+
+    downloadButton.removeEventListener('click', download)
+    deleteButton.removeEventListener('click', deleteAll)
   }
   recalulate()
 }
@@ -158,7 +163,6 @@ function download () {
   const link = document.createElement("a");
   const index = csv.lastIndexOf('\n')
   const date = csv.substring(index + 1, index + 11)
-  console.log(date)
   link.download = date + '.csv';
   link.href = `data:text/csv,${encodeURIComponent(csv)}`;
   link.click();
@@ -166,12 +170,14 @@ function download () {
 }
 
 if (localStorage.getItem('scanner_tracker')) {
-  downloadButton.addEventListener('click', download)
   downloadButton.removeAttribute('disabled')
+  deleteButton.removeAttribute('disabled')
+
+  downloadButton.addEventListener('click', download)
+  deleteButton.addEventListener('click', deleteAll)
 }
 
 startButton.addEventListener('click', start)
-deleteButton.addEventListener('click', deleteAll)
 document.addEventListener('input', recalulate)
 setInterval(recalulate, 10000)
 recalulate()
