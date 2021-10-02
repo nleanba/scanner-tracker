@@ -2,6 +2,7 @@ const idField = document.getElementById('id')
 const tasField = document.getElementById('tas')
 const höheField = document.getElementById('hoehe')
 const seitenField = document.getElementById('seiten')
+const divField = document.getElementById('div')
 const typFields = Array.from(document.getElementsByName('typ'))
 
 const startButton = document.getElementById('start')
@@ -52,6 +53,7 @@ const getDuration = () => {
 
 const recalulate = () => {
   const result = {
+    // order of elements matters here!
     datum: getDateStamp(),
     id: idField.value || '',
     typ: typFields.find(r => r.checked)?.value || '',
@@ -60,9 +62,10 @@ const recalulate = () => {
     seiten: +seitenField.value || '',
     time: getDuration(),
     kw: getWeekNumber(),
+    div: divField.value || '',
   }
 
-  localStorage.setItem('scanner_tracker_fields', JSON.stringify([ result.id, result.typ, result.tas, result.höhe, result.seiten ]))
+  localStorage.setItem('scanner_tracker_fields', JSON.stringify([ result.id, result.typ, result.tas, result.höhe, result.seiten, result.div ]))
 
   let bool = false
   switch (result.time && result.typ) {
@@ -137,6 +140,7 @@ function stop () {
   tasField.value = ''
   höheField.value = ''
   seitenField.value = ''
+  divField.value = ''
   recalulate()
 
   startButton.hidden = false
@@ -198,12 +202,13 @@ if (localStorage.getItem('scanner_tracker_current')) {
 }
 
 if (localStorage.getItem('scanner_tracker_fields')) {
-  const [ id, typ, tas, höhe, seiten ] = JSON.parse(localStorage.getItem('scanner_tracker_fields'))
+  const [ id, typ, tas, höhe, seiten, div ] = JSON.parse(localStorage.getItem('scanner_tracker_fields'))
   idField.value = id
   typFields.find(f => f.value === typ).checked = true
   tasField.value = tas
   höheField.value = höhe
   seitenField.value = seiten
+  divField.value = div
 }
 
 startButton.addEventListener('click', start)
