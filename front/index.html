@@ -10,8 +10,24 @@
 
 <body>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
-      margin: 0;
+      height: 100%;
+      --bright: #F2FBFF;
+      --light: #98CCF4;
+      --medium: #4588E9;
+      --dark: #2C37A1;
+    }
+
+    body {
+      margin: 0 auto;
+      width: min-content;
+      display: flex;
+      flex-direction: column;
     }
 
     h1 {
@@ -26,14 +42,25 @@
 
     header {
       display: flex;
-      background: silver;
-      padding: 8px 17px;
+      background: var(--bright);
+      padding: 8px 8px;
       justify-content: space-between;
+      border-radius: 0 0 6px 6px;
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    main>* {
+      width: 338px;
     }
 
     footer {
-      background: silver;
-      padding: 8px 17px;
+      background: var(--bright);
+      padding: 8px 8px;
+      border-radius: 6px 6px 0 0;
     }
 
     .row {
@@ -51,7 +78,7 @@
     }
 
     .field {
-      border: 1px solid gray;
+      border: 2px solid var(--light);
       border-radius: 6px;
       padding: 4px 8px;
       margin: 8px;
@@ -61,69 +88,100 @@
     }
 
     .field:focus-within,
-    .group:focus-within {
-      outline: 2px solid green;
+    .group.focusable:focus-within {
+      border-color: var(--dark);
     }
 
     input {
       border: none;
       font-size: 20px;
+      background: none;
     }
 
+    button:focus,
     input:focus {
       outline: none;
     }
 
     .group {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(1, 1fr);
+      display: flex;
       border-radius: 6px;
+      border: 2px solid var(--light);
       margin: 8px;
       overflow: hidden;
-      gap: 1px;
-      background: #888;
+      gap: 2px;
+      background: var(--light);
+      flex: 0 0 auto;
     }
 
-    .group label {
+    .group label,
+    .group button {
       position: relative;
-      background: #ddd;
-      padding: 4px 8px;
+      background: #fff;
+      border: none;
+      padding: 8px;
       display: flex;
       flex-direction: column;
       align-content: center;
     }
 
-    .group label.selected {
-      background: #aaa;
+    :focus>svg,
+    :checked+svg {
+      color: var(--dark);
     }
 
-    /*
     .group input {
       position: absolute;
       opacity: 0;
       pointer-events: none;
     }
-*/
 
     svg {
-      margin-top: 4px;
+      width: 24px;
+      height: 24px;
+      display: block;
     }
 
     .group * {
       display: block;
     }
+
+    main pre {
+      padding: 0 8px 8px;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    #result:empty::after {
+      color: gray;
+      content: '(no records yet)';
+    }
+
+    .row pre {
+      margin: 4px 0;
+    }
+
+    button {
+      padding: 8px;
+    }
+
+    label:focus-within,
+    button:focus {
+      background: var(--bright);
+    }
   </style>
+
   <header>
     <h1>scanner-tracker</h1>
     <code>disconnected</code>
   </header>
+
   <main>
     <label class="field">
       Auftrag №
       <input type="number" min="0" id="id">
     </label>
-    <div class="group">
+    <div class="group focusable">
       <label>
         <input type="radio" name="typ" value="Dossier Prüfen">
         <svg viewBox="0 0 24 24">
@@ -193,33 +251,49 @@
       Seiten
       <input type="number" min="0" id="seiten">
     </label>
-    <footer>
-      <div class="row">
+    <pre id="current"></pre>
+    <pre id="result"></pre>
+  </main>
+
+  <footer>
+    <div class="row">
+      <div class="group">
         <button id="start">
-          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path fill="currentColor"
               d="M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
           </svg>
         </button>
         <button id="pause" disabled>
-          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
           </svg>
         </button>
         <button id="stop" disabled>
-          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path fill="currentColor" d="M18,18H6V6H18V18Z" />
           </svg>
         </button>
       </div>
-      <div class="row">
-        <pre id="from">--:--</pre>
-        <pre id="arrows">→</pre>
-        <pre id="to">--:--</pre>
+      <div class="group">
+        <button id="download" disabled>
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+          </svg>
+        </button>
+        <!--<button id="delete">
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" />
+        </svg>
+        </button>-->
       </div>
-    </footer>
-    <pre id="result"></pre>
-  </main>
+    </div>
+    <div class="row">
+      <pre id="from">--:--</pre>
+      <pre id="arrows">→</pre>
+      <pre id="to">--:--</pre>
+    </div>
+  </footer>
 
   <script src="index.js"></script>
 </body>

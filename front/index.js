@@ -3,13 +3,16 @@ const tasField = document.getElementById('tas')
 const höheField = document.getElementById('hoehe')
 const seitenField = document.getElementById('seiten')
 const typFields = Array.from(document.getElementsByName('typ'))
+
 const startButton = document.getElementById('start')
 const pauseButton = document.getElementById('pause')
 const stopButton = document.getElementById('stop')
+const downloadButton = document.getElementById('download')
 
 const fromList = document.getElementById('from')
 const arrowsList = document.getElementById('arrows')
 const toList = document.getElementById('to')
+const currentList = document.getElementById('current')
 const resultList = document.getElementById('result')
 
 const M = {
@@ -90,7 +93,8 @@ const recalulate = () => {
   }
 
   const csv = Object.values(result).join(';') + ';'
-  resultList.innerText = Object.entries(result).map(([a, b]) => `${a.padEnd(6)}: ${b}`).join('\n')
+  resultList.innerText = localStorage.getItem('scanner_tracker')
+  currentList.innerText = Object.entries(result).map(([a, b]) => `${a.padEnd(5)}: ${b}`).filter(v => v.match(/datum|typ|time/)).join('\n')
   return csv
 }
 
@@ -136,6 +140,29 @@ function stop () {
 
   startButton.addEventListener('click', start)
   pauseButton.removeEventListener('click', pause)
+  downloadButton.addEventListener('click', download)
+}
+
+function download () {
+  const csv = localStorage.getItem('scanner_tracker')
+  const link = document.createElement("a");
+  const index = csv.lastIndexOf('\n')
+  const date = csv.substring(index + 1, index + 11)
+  console.log(date)
+  link.download = date + '.csv';
+  link.href = `data:text/csv,${encodeURIComponent(csv)}`;
+  link.click();
+  if (confirm('delete entries?')) {
+    localStorage.removeItem('scanner_tracker')
+    downloadButton.removeEventListener('click', download)
+    downloadButton.setAttribute('disabled', 'disabled')
+  }
+  recalulate()
+}
+
+if (localStorage.getItem('scanner_tracker')) {
+  downloadButton.addEventListener('click', download)
+  downloadButton.removeAttribute('disabled')
 }
 
 startButton.addEventListener('click', start)
