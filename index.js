@@ -62,6 +62,8 @@ const recalulate = () => {
     kw: getWeekNumber(),
   }
 
+  localStorage.setItem('scanner_tracker_fields', JSON.stringify([ result.id, result.typ, result.tas, result.höhe, result.seiten ]))
+
   let bool = false
   switch (result.time && result.typ) {
     case 'Dossier Vorbereiten':
@@ -93,7 +95,7 @@ const recalulate = () => {
   typeList.innerHTML = result.typ || '<i>kein Typ ausgewählt</i>'
   durationList.innerText = result.time
   currentList.innerText = `${result.datum} (KW ${result.kw})`
-  timesList.innerText = (M.start.length ? M.start.map((s, i) => `${getTimeStamp(s)} → ${M.stop[i] ? getTimeStamp(M.stop[i]) : '--:--'}`).join(',') : '--:-- → --:--')
+  timesList.innerText = (M.start.length ? M.start.map((s, i) => `${getTimeStamp(s)} → ${M.stop[i] ? getTimeStamp(M.stop[i]) : '--:--'}`).join(', ') : '--:-- → --:--')
   resultList.innerText = localStorage.getItem('scanner_tracker')
   return csv
 }
@@ -173,6 +175,9 @@ function download () {
 }
 
 if (localStorage.getItem('scanner_tracker')) {
+  CSV.splice(0, 0, ...localStorage.getItem('scanner_tracker').split('\n'))
+  console.log(CSV)
+
   downloadButton.removeAttribute('disabled')
   deleteButton.removeAttribute('disabled')
 
@@ -190,6 +195,15 @@ if (localStorage.getItem('scanner_tracker_current')) {
     startButton.removeEventListener('click', start)
     pauseButton.addEventListener('click', pause)
   }
+}
+
+if (localStorage.getItem('scanner_tracker_fields')) {
+  const [ id, typ, tas, höhe, seiten ] = JSON.parse(localStorage.getItem('scanner_tracker_fields'))
+  idField.value = id
+  typFields.find(f => f.value === typ).checked = true
+  tasField.value = tas
+  höheField.value = höhe
+  seitenField.value = seiten
 }
 
 startButton.addEventListener('click', start)
