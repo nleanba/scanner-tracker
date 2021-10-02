@@ -10,9 +10,9 @@ const stopButton = document.getElementById('stop')
 const downloadButton = document.getElementById('download')
 const deleteButton = document.getElementById('delete')
 
-const fromList = document.getElementById('from')
-const arrowsList = document.getElementById('arrows')
-const toList = document.getElementById('to')
+const timesList = document.getElementById('times')
+const durationList = document.getElementById('duration')
+const typeList = document.getElementById('type')
 const currentList = document.getElementById('current')
 const resultList = document.getElementById('result')
 
@@ -51,9 +51,6 @@ const getDuration = () => {
 }
 
 const recalulate = () => {
-  fromList.innerText = M.start.map(getTimeStamp).join('\n') || '--:--'
-  arrowsList.innerText = '→\n'.repeat(M.start.length || 1)
-  toList.innerText = M.stop.map(getTimeStamp).join('\n') + (M.stop.length ? '\n' : '') + (M.start.length > M.stop.length || !M.start.length ? '--:--' : '')
   const result = {
     datum: getDateStamp(),
     id: idField.value || '',
@@ -93,13 +90,17 @@ const recalulate = () => {
   }
 
   const csv = Object.values(result).join(';') + ';'
+  typeList.innerHTML = result.typ || '<i>kein Typ ausgewählt</i>'
+  durationList.innerText = result.time
+  currentList.innerText = `${result.datum} (KW ${result.kw})`
+  timesList.innerText = (M.start.length ? M.start.map((s, i) => `${getTimeStamp(s)} → ${M.stop[i] ? getTimeStamp(M.stop[i]) : '--:--'}`).join(',') : '--:-- → --:--')
   resultList.innerText = localStorage.getItem('scanner_tracker')
-  currentList.innerHTML = `${result.typ || '<i>kein typ ausgewählt</i>'}\nDauer: ${result.time}\nDatum: ${result.datum} (KW ${result.kw})\n`
   return csv
 }
 
 function start () {
   M.start.push(new Date())
+  localStorage.setItem('scanner_tracker_current', JSON.stringify(M))
   recalulate()
 
   startButton.hidden = true
@@ -111,6 +112,7 @@ function start () {
 
 function pause () {
   M.stop.push(new Date())
+  localStorage.setItem('scanner_tracker_current', JSON.stringify(M))
   recalulate()
 
   startButton.hidden = false
@@ -128,6 +130,7 @@ function stop () {
 
   M.start = []
   M.stop = []
+  localStorage.setItem('scanner_tracker_current', JSON.stringify(M))
   idField.value = ''
   tasField.value = ''
   höheField.value = ''
@@ -175,6 +178,18 @@ if (localStorage.getItem('scanner_tracker')) {
 
   downloadButton.addEventListener('click', download)
   deleteButton.addEventListener('click', deleteAll)
+}
+
+if (localStorage.getItem('scanner_tracker_current')) {
+  const { start, stop } = JSON.parse(localStorage.getItem('scanner_tracker_current'))
+  M.start = start.map(d => new Date(d))
+  M.stop = stop.map(d => new Date(d))
+  if (M.start.length > M.stop.length) {
+    startButton.hidden = true
+    pauseButton.hidden = false
+    startButton.removeEventListener('click', start)
+    pauseButton.addEventListener('click', pause)
+  }
 }
 
 startButton.addEventListener('click', start)
