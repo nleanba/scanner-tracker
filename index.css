@@ -5,18 +5,33 @@
 html,
 body {
   height: 100%;
+}
+
+body {
+  --background: #FFFFFF;
+  --gray: #888888;
   --bright: #F2FBFF;
   --light: #98CCF4;
   --medium: #4588E9;
   --dark: #2C37A1;
-}
-
-body {
+  
+  background: var(--background);
   margin: 0 auto;
   width: min-content;
   display: flex;
   flex-direction: column;
   font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --background: #121212;
+    --gray: #5e5e5e;
+    --bright: #F2FBFF;
+    --light: #98CCF4;
+    --medium: #4588E9;
+    --dark: #2C37A1;
+  }
 }
 
 h1 {
@@ -123,12 +138,16 @@ input:focus {
 .group label,
 .group button {
   position: relative;
-  background: #fff;
+  background: var(--background);
   border: none;
   padding: 8px;
   display: flex;
   flex-direction: column;
   align-content: center;
+}
+
+.group label {
+  color: var(--gray);
 }
 
 :focus>svg,
@@ -164,7 +183,7 @@ main pre {
 }
 
 #result:empty::after {
-  color: gray;
+  color: var(--gray);
   content: '(no records yet)';
 }
 
