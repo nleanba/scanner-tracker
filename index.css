@@ -27,10 +27,11 @@ body {
   body {
     --background: #121212;
     --gray: #5e5e5e;
-    --bright: #F2FBFF;
-    --light: #98CCF4;
-    --medium: #4588E9;
-    --dark: #2C37A1;
+    --medium: #F2FBFF;
+    --dark: #98CCF4;
+    --bright: #4588E9;
+    --bright: #2C37A1;
+    color: #CCCCCC;
   }
 }
 
@@ -193,6 +194,11 @@ main pre {
 
 button {
   padding: 8px;
+  color: inherit;
+}
+
+button[disabled] {
+  color: var(--gray);
 }
 
 label:focus-within,
