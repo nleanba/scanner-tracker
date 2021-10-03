@@ -14,6 +14,7 @@ body {
   --light: #98CCF4;
   --medium: #4588E9;
   --dark: #2C37A1;
+  --inputtext: inherit;
   
   background: var(--background);
   margin: 0 auto;
@@ -31,6 +32,7 @@ body {
     --dark: #98CCF4;
     --bright: #4588E9;
     --bright: #2C37A1;
+    --inputtext: #FFFFFF;
     color: #CCCCCC;
   }
 }
@@ -118,6 +120,7 @@ input {
   background: none;
   padding: 0;
   margin: 0;
+  color: var(--inputtext);
 }
 
 button:focus,
