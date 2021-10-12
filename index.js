@@ -157,6 +157,7 @@ function stop () {
 function deleteAll () {
   if (confirm('delete entries?')) {
     localStorage.removeItem('scanner_tracker')
+    while(CSV.pop()) { /* clears CSV */ }
 
     downloadButton.setAttribute('disabled', 'disabled')
     deleteButton.setAttribute('disabled', 'disabled')
