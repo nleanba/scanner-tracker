@@ -76,7 +76,7 @@ const recalulate = () => {
       bool = (result.time && result.id && result.typ && result.höhe && result.tas)
       break;
     case 'Scanning (Kodak)':
-    case 'Scanning (Microbox)':
+    case 'Scanning (MicroBox)':
     case '100% Kontrolle':
       bool = (result.time && result.id && result.typ && result.höhe && result.tas && result.seiten)
       break;
